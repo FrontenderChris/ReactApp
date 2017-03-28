@@ -1,81 +1,13 @@
-/**
- * Created by Cris on 2017/3/26.
- */
 import React from 'react';
-import 'whatwg-fetch';
+import FormItem from '../components/FormItem';
+import formProvider from '../utils/formProvider';
 
 class UserAdd extends React.Component {
-    constructor () {
-        super();
-        this.state = {
-            form: {
-                name: {
-                    valid: false,
-                    value: '',
-                    error: ''
-                },
-                age: {
-                    valid: false,
-                    value: 0,
-                    error: ''
-                },
-                gender: {
-                    valid: false,
-                    value: '',
-                    error: ''
-                }
-            }
-        };
-    }
-    handleValueChange (field, value, type = 'string') {
-        // 由于表单的值都是字符串，我们可以根据传入type为number来手动转换value的类型为number类型
-        if (type === 'number') {
-            value = +value;
-        }
-
-        const {form} = this.state;
-
-        const newFieldObj = {value, valid: true, error: ''};
-
-        switch (field) {
-            case 'name': {
-                if (value.length >= 5) {
-                    newFieldObj.error = '用户名最多4个字符';
-                    newFieldObj.valid = false;
-                } else if (value.length === 0) {
-                    newFieldObj.error = '请输入用户名';
-                    newFieldObj.valid = false;
-                }
-                break;
-            }
-            case 'age': {
-                if (value > 100 || value <= 0) {
-                    newFieldObj.error = '请输入1~100之间的数字';
-                    newFieldObj.valid = false;
-                }
-                break;
-            }
-            case 'gender': {
-                if (!value) {
-                    newFieldObj.error = '请选择性别';
-                    newFieldObj.valid = false;
-                }
-                break;
-            }
-        }
-
-        this.setState({
-            form: {
-                ...form,
-                [field]: newFieldObj
-            }
-        });
-    }
     handleSubmit (e) {
         e.preventDefault();
-        //alert(JSON.stringify(this.state));
-        const {form: {name, age, gender}} = this.state;
-        if (!name.valid || !age.valid || !gender.valid) {
+
+        const {form: {name, age, gender}, formValid} = this.props;
+        if (!formValid) {
             alert('请填写正确的信息后重试');
             return;
         }
@@ -102,7 +34,7 @@ class UserAdd extends React.Component {
             .catch((err) => console.error(err));
     }
     render () {
-        const {form: {name, age, gender}} = this.state;
+        const {form: {name, age, gender}, onFormChange} = this.props;
         return (
             <div>
                 <header>
@@ -111,33 +43,30 @@ class UserAdd extends React.Component {
 
                 <main>
                     <form onSubmit={(e) => this.handleSubmit(e)}>
-                        <label>用户名：</label>
-                        <input
-                            type="text"
-                            value={name.value}
-                            onChange={(e) => this.handleValueChange('name', e.target.value)}
-                        />
-                        {!name.valid && <span>{name.error}</span>}
-                        <br/>
-                        <label>年龄：</label>
-                        <input
-                            type="number"
-                            value={age.value || ''}
-                            onChange={(e) => this.handleValueChange('age', e.target.value, 'number')}
-                        />
-                        {!age.valid && <span>{age.error}</span>}
-                        <br/>
-                        <label>性别：</label>
-                        <select
-                            value={gender.value}
-                            onChange={(e) => this.handleValueChange('gender', e.target.value)}
-                        >
-                            <option value="">请选择</option>
-                            <option value="male">男</option>
-                            <option value="female">女</option>
-                        </select>
-                        {!gender.valid && <span>{gender.error}</span>}
-                        <br/>
+                        <FormItem label="用户名：" valid={name.valid} error={name.error}>
+                            <input
+                                type="text"
+                                value={name.value}
+                                onChange={(e) => onFormChange('name', e.target.value)}
+                            />
+                        </FormItem>
+                        <FormItem label="年龄：" valid={age.valid} error={age.error}>
+                            <input
+                                type="number"
+                                value={age.value || ''}
+                                onChange={(e) => onFormChange('age', +e.target.value)}
+                            />
+                        </FormItem>
+                        <FormItem label="性别：" valid={gender.valid} error={gender.error}>
+                            <select
+                                value={gender.value}
+                                onChange={(e) => onFormChange('gender', e.target.value)}
+                            >
+                                <option value="">请选择</option>
+                                <option value="male">男</option>
+                                <option value="female">女</option>
+                            </select>
+                        </FormItem>
                         <br/>
                         <input type="submit" value="提交"/>
                     </form>
@@ -146,5 +75,45 @@ class UserAdd extends React.Component {
         );
     }
 }
+
+UserAdd = formProvider({
+    name: {
+        defaultValue: '',
+        rules: [
+            {
+                pattern: function (value) {
+                    return value.length > 0;
+                },
+                error: '请输入用户名'
+            },
+            {
+                pattern: /^.{1,4}$/,
+                error: '用户名最多4个字符'
+            }
+        ]
+    },
+    age: {
+        defaultValue: 0,
+        rules: [
+            {
+                pattern: function (value) {
+                    return value >= 1 && value <= 100;
+                },
+                error: '请输入1~100的年龄'
+            }
+        ]
+    },
+    gender: {
+        defaultValue: '',
+        rules: [
+            {
+                pattern: function (value) {
+                    return !!value;
+                },
+                error: '请选择性别'
+            }
+        ]
+    }
+})(UserAdd);
 
 export default UserAdd;
