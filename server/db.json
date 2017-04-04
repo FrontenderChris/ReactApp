@@ -2,7 +2,7 @@
   "user": [
     {
       "name": "Cris",
-      "age": 31,
+      "age": 29,
       "gender": "male",
       "id": 10000
     },
@@ -13,23 +13,17 @@
       "gender": "male"
     },
     {
-      "name": "Ariy",
-      "age": 23,
-      "gender": "male",
-      "id": 10002
-    },
-    {
-      "name": "Acc",
-      "age": 32,
+      "name": "Bui",
+      "age": 22,
       "gender": "female",
-      "id": 10003
+      "id": 10002
     }
   ],
   "book": [
     {
       "name": "JavaScript从入门到精通",
       "price": 99,
-      "owner_id": 10001,
+      "owner_id": 10002,
       "id": 10000
     },
     {
@@ -37,12 +31,6 @@
       "name": "Java从入门到放弃",
       "price": 1990,
       "owner_id": 10001
-    },
-    {
-      "name": "JavascriptReact",
-      "price": 33,
-      "owner_id": 10003,
-      "id": 10002
     }
   ]
 }
