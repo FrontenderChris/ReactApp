@@ -2,7 +2,6 @@
  * Created by Cris on 2017/4/3.
  */
 import React from 'react';
-import HomeLayout from '../layouts/HomeLayout';
 import UserEditor from '../components/UserEditor';
 import { get } from '../utils/request';
 
@@ -26,13 +25,7 @@ class UserEdit extends React.Component {
 
     render () {
         const {user} = this.state;
-        return (
-            <HomeLayout title="编辑用户">
-                {
-                    user ? <UserEditor editTarget={user}/> : '加载中...'
-                }
-            </HomeLayout>
-        );
+        return user ? <UserEditor editTarget={user}/> : <span>Load...</span>;
     }
 }
 

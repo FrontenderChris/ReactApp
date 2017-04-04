@@ -1,7 +1,7 @@
 /**
  * Created by Cris on 2017/4/4.
  */
-const expireTime = 1000 * 60;
+const expireTime = 1000 * 600;
 
 module.exports = function (req, res, next) {
     res.header('Access-Control-Expose-Headers', 'access-token');

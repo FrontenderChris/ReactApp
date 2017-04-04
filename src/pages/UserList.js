@@ -2,7 +2,7 @@
  * Created by Cris on 2017/4/3.
  */
 import React from 'react';
-import HomeLayout from '../layouts/HomeLayout';
+import { message, Table, Button, Popconfirm } from 'antd';
 import { get, del } from '../utils/request';
 
 class UserList extends React.Component {
@@ -27,60 +27,56 @@ class UserList extends React.Component {
     }
 
     handleDel (user) {
-        const confirmed = confirm(`确定要删除用户 ${user.name} 吗？`);
-
-        if (confirmed) {
-            del('http://localhost:3000/user/' + user.id)
-                .then(res => {
-                    this.setState({
-                        userList: this.state.userList.filter(item => item.id !== user.id)
-                    });
-                    alert('删除用户成功');
-                })
-                .catch(err => {
-                    console.error(err);
-                    alert('删除用户失败');
+        del('http://localhost:3000/user/' + user.id)
+            .then(res => {
+                this.setState({
+                    userList: this.state.userList.filter(item => item.id !== user.id)
                 });
-        }
+                message.success('This user has been deleted!');
+            })
+            .catch(err => {
+                console.error(err);
+                message.error('Operation failed ');
+            });
     }
 
     render () {
         const {userList} = this.state;
 
-        return (
-            <HomeLayout title="用户列表">
-                <table>
-                    <thead>
-                    <tr>
-                        <th>用户ID</th>
-                        <th>用户名</th>
-                        <th>性别</th>
-                        <th>年龄</th>
-                        <th>操作</th>
-                    </tr>
-                    </thead>
+        const columns = [
+            {
+                title: 'UserID',
+                dataIndex: 'id'
+            },
+            {
+                title: 'UserName',
+                dataIndex: 'name'
+            },
+            {
+                title: 'Gender',
+                dataIndex: 'gender'
+            },
+            {
+                title: 'Age',
+                dataIndex: 'age'
+            },
+            {
+                title: 'Operation',
+                render: (text, record) => {
+                    return (
+                        <Button.Group type="ghost">
+                            <Button size="small" onClick={() => this.handleEdit(record)}>Edit</Button>
+                            <Popconfirm title="Delete it？" onConfirm={() => this.handleDel(record)}>
+                                <Button size="small">Delete</Button>
+                            </Popconfirm>
+                        </Button.Group>
+                    );
+                }
+            }
+        ];
 
-                    <tbody>
-                    {
-                        userList.map((user) => {
-                            return (
-                                <tr key={user.id}>
-                                    <td>{user.id}</td>
-                                    <td>{user.name}</td>
-                                    <td>{user.gender}</td>
-                                    <td>{user.age}</td>
-                                    <td>
-                                        <a href="javascript:void(0)" onClick={() => this.handleEdit(user)}>编辑</a>
-                                        &nbsp;
-                                        <a href="javascript:void(0)" onClick={() => this.handleDel(user)}>删除</a>
-                                    </td>
-                                </tr>
-                            );
-                        })
-                    }
-                    </tbody>
-                </table>
-            </HomeLayout>
+        return (
+            <Table columns={columns} dataSource={userList} rowKey={row => row.id}/>
         );
     }
 }
